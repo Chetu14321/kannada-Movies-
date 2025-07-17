@@ -16,6 +16,7 @@ const addMovie = async (req, res) => {
   try {
     const { title, description, genre, year } = req.body;
     const filePath = req.file ? req.file.path : null;
+     const poster = req.file.filename;
 
     const movie = await Movie.create({
       title,
