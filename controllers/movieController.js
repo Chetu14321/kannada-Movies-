@@ -22,7 +22,8 @@ const addMovie = async (req, res) => {
       description,
       genre,
       year,
-      file: filePath
+      file: filePath,
+      poster,
     });
 
     res.status(201).json(movie);
