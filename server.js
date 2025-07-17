@@ -8,7 +8,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
-app.use('/uploads', express.static('uploads'));
+// app.use('/uploads', express.static('uploads'));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const authRoutes = require('./routes/authRoutes');
 const movieRoutes = require('./routes/movieRoutes');
