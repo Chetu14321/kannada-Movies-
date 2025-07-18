@@ -23,7 +23,7 @@ const addMovie = async (req, res) => {
   try {
     console.log('BODY:', req.body);
 
-    const { title, genre, description, year, posterUrl, videoUrl } = req.body;
+    const { title, genre, description, year, poster, file } = req.body;
 
     
 
@@ -32,8 +32,8 @@ const addMovie = async (req, res) => {
       genre,
       description,
       year: year ? Number(year) : undefined,
-      poster: posterUrl,
-      file: videoUrl,
+      poster,
+      file 
     });
 
     res.status(201).json(newMovie);
