@@ -11,6 +11,9 @@ app.use(express.json());
 app.use(cookieParser());
 // app.use('/uploads', express.static('uploads'));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+console.log('__dirname:', __dirname);
+console.log('Serving uploads from:', path.join(__dirname, 'uploads'));
+
 
 const authRoutes = require('./routes/authRoutes');
 const movieRoutes = require('./routes/movieRoutes');

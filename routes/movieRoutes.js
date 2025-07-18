@@ -11,11 +11,7 @@ const restrictTo = require('../middleware/roleMiddleware');
 
 const router = express.Router();
 const upload = require('../middleware/upload');
-router.post('/', protect, (req, res, next) => {
-  console.log('BODY:', req.body);
-  console.log('FILES:', req.file || req.files);
-  next();
-}, upload.single('file'), addMovie);
+router.post("/movies", upload.single("file"), addMovie);
 
 
 

@@ -10,30 +10,40 @@ const getMovie = async (req, res) => {
   if (!movie) return res.status(404).json({ message: 'Not found' });
   res.json(movie);
 };
-// const Movie = require('../models/Movie');
+
 
 const addMovie = async (req, res) => {
   try {
-    const { title, description, genre, year } = req.body;
-    const filePath = req.file ? req.file.path : null;
-     const poster = req.file.filename;
+    const { title, genre, description, poster } = req.body;
+    const videoFile = req.file;
 
-    const movie = await Movie.create({
+    if (!videoFile) {
+      return res.status(400).json({ message: "Video file is required." });
+    }
+
+    const videoUrl = `${req.protocol}://${req.get("host")}/uploads/${videoFile.filename}`;
+
+    const newMovie = await Movie.create({
       title,
-      description,
       genre,
-      year,
-      file: filePath,
-      poster,
+      description,
+      poster, // Use poster from body directly
+      file: videoUrl,
     });
 
-    res.status(201).json(movie);
+    res.status(201).json(newMovie);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("Add Movie Error:", err);
+    res.status(500).json({ message: "Error while adding movie" });
   }
 };
 
-module.exports = { addMovie };
+
+
+
+
+
+
 
 
 
