@@ -1,39 +1,33 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const dotenv = require('dotenv').config();
 const cors = require('cors');
-const cookieParser = require('cookie-parser');
-const path=require('path')
+const path = require('path');
+require('dotenv').config();
 
 const app = express();
+
 app.use(cors());
 app.use(express.json());
-app.use(cookieParser());
-// app.use('/uploads', express.static('uploads'));
+app.use(express.urlencoded({ extended: true }));
+
+// Serve static files from uploads folder
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-console.log('__dirname:', __dirname);
-console.log('Serving uploads from:', path.join(__dirname, 'uploads'));
 
-
-const authRoutes = require('./routes/authRoutes');
 const movieRoutes = require('./routes/movieRoutes');
-
-app.use('/api/auth', authRoutes);
 app.use('/api/movies', movieRoutes);
 
-// Add this root route
+// Simple root route
 app.get('/', (req, res) => {
   res.json({ message: 'API is running' });
 });
 
 const PORT = process.env.PORT || 5000;
 
-mongoose.connect(process.env.MONGO_URI)
+mongoose
+  .connect(process.env.MONGO_URI)
   .then(() => {
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-    });
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
   })
   .catch((err) => {
-    console.error('Failed to connect to MongoDB:', err);
+    console.error('MongoDB connection failed:', err);
   });
