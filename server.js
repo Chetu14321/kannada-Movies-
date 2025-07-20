@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
+const authRoutes=require("./routes/authRoutes")
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const movieRoutes = require('./routes/movieRoutes');
 app.use('/api/movies', movieRoutes);
+app.use('/api/movies',authRoutes)
 
 // Simple root route
 app.get('/', (req, res) => {
