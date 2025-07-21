@@ -1,17 +1,27 @@
-const jwt = require('jsonwebtoken');
+const { StatusCodes } = require('http-status-codes')
+const jwt = require('jsonwebtoken')
 
-const protect = (req, res, next) => {
-  const token = req.cookies.token;
+const protect = async (req,res,next) => {
+    try {
+        // let token =  req.header('Authorization')
+        let { login_token } = req.signedCookies
 
-  if (!token) return res.status(401).json({ message: 'No token, not authorized' });
+        if(!login_token) 
+            return res.status(StatusCodes.NOT_FOUND).json({msg: `token not found`})
 
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
-    next();
-  } catch {
-    res.status(401).json({ message: 'Token invalid' });
-  }
-};
+        // verify
+        await jwt.verify(login_token, process.env.SECRET_KEY,(err,data) => {
+            if(err)
+                return res.status(404).json({ msg: err.message })
+ 
+            let { id } = data
+            req.userId = id;
 
-module.exports = protect;
+            next()
+        })
+    }catch(err){
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: err.message })
+    } 
+}
+
+module.exports = protect

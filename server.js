@@ -1,35 +1,54 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const path = require('path');
-require('dotenv').config();
-const authRoutes=require("./routes/authRoutes")
+const express=require('express')
+const {StatusCodes} = require('http-status-codes')
+require('dotenv').config()
+const PORT=process.env.PORT
+const app=express()
+const connectdb=require("./db/dbconnect")
+const cookieParser=require("cookie-parser")
+const path=require('path')
 
-const app = express();
+const cors = require('cors')
 
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-// Serve static files from uploads folder
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-const movieRoutes = require('./routes/movieRoutes');
-app.use('/api/movies', movieRoutes);
-app.use('/api/movies',authRoutes)
 
-// Simple root route
-app.get('/', (req, res) => {
-  res.json({ message: 'API is running' });
-});
+// import cors from 'cors';
+app.use(cors()); // this line must be before any routes
 
-const PORT = process.env.PORT || 5000;
+app.use(express.static("./client/build"))
+app.use(express.static("./build"))
 
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => {
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-  })
-  .catch((err) => {
-    console.error('MongoDB connection failed:', err);
-  });
+app.use(cookieParser(process.env.SECRET_KEY))
+
+
+
+// Middleware to parse JSON request bodies
+app.use(express.urlencoded({ extended: true }))
+app.use(express.json())
+
+
+
+//index route
+app.get("/",async(req,res)=>{
+    if(process.env.MODE==="development"){
+    return res.status(StatusCodes.ACCEPTED).json({ message:"welcome to auth api"})
+    }
+    if(
+        process.env.MODE==="production"
+    ){
+        res.sendFile("index.html",{root:path.join(__dirname,"/build")})    }
+})
+
+//api route
+app.use(`/api/auth`,require('./routes/authRoutes'))
+app.use(`/api/movies`,require('./routes/movieRoutes'))
+// app.use(`/api/topic`,require('./route/topic.route'))
+
+//default routes
+app.all("/",async(req,res)=>{
+    return res.status(StatusCodes.NOT_FOUND).json({ message:"requested path not found"})
+})
+app.listen(PORT,function(){
+    connectdb()
+    console.log(`Server is running at http://localhost:${PORT}`)
+})

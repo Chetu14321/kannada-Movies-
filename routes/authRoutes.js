@@ -1,9 +1,29 @@
-const express = require('express');
-const { register, login } = require('../controllers/authController');
+const authRoute=require('express').Router();
 
-const router = express.Router();
+const {regController,loginController,logoutController,verifyController,updatePassController,forgotPassController, getAllUsersController} =require('../controllers/authController');
+const authMiddleware = require('../middleware/authMiddleware');
 
-router.post('/register', register);
-router.post('/login', login);
+//register
+authRoute.post('/register',regController);
 
-module.exports = router;
+//login
+authRoute.post('/login',loginController);
+
+//logout
+authRoute.get('/logout',logoutController);
+
+//verify email address
+authRoute.get('/verify',authMiddleware,verifyController);
+
+//update password
+authRoute.patch('/update/Password',updatePassController);
+
+//forgot password request
+authRoute.post('/forgot/Password',forgotPassController);
+
+//all users
+// authRoute.get("/all", getAllUsersController);
+
+
+
+module.exports=authRoute;
