@@ -8,7 +8,9 @@ const cookieParser=require("cookie-parser")
 const path=require('path')
 
 const cors = require('cors')
-
+app.use(cors({
+  origin: 'https://kannada-movies.onrender.com', // Replace with the actual domain of your frontend
+}));
 
 
 
