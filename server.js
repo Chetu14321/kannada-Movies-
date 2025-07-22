@@ -30,13 +30,7 @@ app.use(express.json())
 
 //index route
 app.get("/",async(req,res)=>{
-    if(process.env.MODE==="development"){
-    return res.status(StatusCodes.ACCEPTED).json({ message:"welcome to auth api"})
-    }
-    if(
-        process.env.MODE==="production"
-    ){
-        res.sendFile("index.html",{root:path.join(__dirname,"/build")})    }
+   console.log("welcome to api")
 })
 
 //api route
