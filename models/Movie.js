@@ -1,10 +1,13 @@
-const mongoose=require('mongoose')
+const mongoose = require('mongoose');
+
 const movieSchema = new mongoose.Schema({
-  title: String,
-  description: String,
-  genre: String,
-  year: Number,
-  poster: String,
-  file: String, // path or URL to poster image
+    title: { type: String, required: true },
+    description: { type: String },
+    genre: { type: String },
+    videoUrl: { type: String, required: true },  // Path to the video file
+    thumbnailUrl: { type: String },
+    duration: { type: Number },
+    rating: { type: Number }
 });
+
 module.exports = mongoose.model('Movie', movieSchema);
