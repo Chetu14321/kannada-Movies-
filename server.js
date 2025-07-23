@@ -7,15 +7,28 @@ const connectdb=require("./db/dbconnect")
 const cookieParser=require("cookie-parser")
 const path=require('path')
 
-const cors = require('cors')
+
+
+// Allow multiple origins (local + production)
+const allowedOrigins = [
+  'http://localhost:8081',              // Metro (React Native)
+  'http://localhost:3000',              // Web dev (if used)
+  'https://kannada-movies.onrender.com' // Production site
+];
+
 app.use(cors({
-  origin: 'https://kannada-movies.onrender.com', // Replace with the actual domain of your frontend
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
 }));
-
-
-
-// import cors from 'cors';
-app.use(cors()); // this line must be before any routes
+// this line must be before any routes
 
 app.use(express.static("./client/build"))
 app.use(express.static("./build"))
