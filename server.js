@@ -8,6 +8,8 @@ const cookieParser=require("cookie-parser")
 const path=require('path')
 
 
+const cors = require('cors');
+
 
 // Allow multiple origins (local + production)
 const allowedOrigins = [
