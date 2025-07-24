@@ -35,6 +35,7 @@ app.use(cors({
 app.use(express.static("./client/build"))
 app.use(express.static("./build"))
 
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(cookieParser(process.env.SECRET_KEY))
 
 
