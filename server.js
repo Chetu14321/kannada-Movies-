@@ -1,21 +1,26 @@
-const express=require('express')
-const {StatusCodes} = require('http-status-codes')
-require('dotenv').config()
-const PORT=process.env.PORT
-const app=express()
-const connectdb=require("./db/dbconnect")
-const cookieParser=require("cookie-parser")
-const path=require('path')
-
-
+// server.js
+const express = require('express');
+const { StatusCodes } = require('http-status-codes');
+require('dotenv').config();
+const cookieParser = require('cookie-parser');
+const path = require('path');
 const cors = require('cors');
 
+const connectdb = require('./db/dbconnect');
+const authRoutes = require('./routes/authRoutes');
+const movieRoutes = require('./routes/movieRoutes');
 
-// Allow multiple origins (local + production)
+const app = express();
+
+// Environment variables
+const PORT = process.env.PORT || 5000;
+const SECRET_KEY = process.env.SECRET_KEY;
+
+// CORS configuration
 const allowedOrigins = [
-  'http://localhost:8081',              // Metro (React Native)
-  'http://localhost:3000',              // Web dev (if used)
-  'https://kannada-movies.onrender.com' // Production site
+  'http://localhost:8081',              // React Native
+  'http://localhost:3000',              // Web dev
+  'https://kannada-movies.onrender.com' // Production
 ];
 
 app.use(cors({
@@ -30,37 +35,54 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 }));
-// this line must be before any routes
 
-app.use(express.static("./client/build"))
-app.use(express.static("./build"))
+// Error handler for CORS
+app.use((err, req, res, next) => {
+  if (err.message === 'Not allowed by CORS') {
+    return res.status(403).json({ error: 'CORS policy disallows this origin' });
+  }
+  next(err);
+});
 
+// Static file serving (React frontend)
+app.use(express.static(path.join(__dirname, 'client', 'build')));
+
+// Public folder for file uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-app.use(cookieParser(process.env.SECRET_KEY))
 
+// Middleware
+app.use(cookieParser(SECRET_KEY));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
+// Basic root route
+app.get("/", (req, res) => {
+  console.log("Welcome to API");
+  res.send("Welcome to Kannada Movies API");
+});
 
-// Middleware to parse JSON request bodies
-app.use(express.urlencoded({ extended: true }))
-app.use(express.json())
+// API Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/movies', movieRoutes);
 
+// Catch-all for API routes that don't exist
+app.all('/api/*', (req, res) => {
+  res.status(StatusCodes.NOT_FOUND).json({ message: "API route not found" });
+});
 
+// Serve React SPA on all non-API routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
+});
 
-//index route
-app.get("/",async(req,res)=>{
-   console.log("welcome to api")
-})
+// Global error handler (optional)
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Something went wrong' });
+});
 
-//api route
-app.use(`/api/auth`,require('./routes/authRoutes'))
-app.use(`/api/movies`,require('./routes/movieRoutes'))
-// app.use(`/api/topic`,require('./route/topic.route'))
-
-//default routes
-app.all("/",async(req,res)=>{
-    return res.status(StatusCodes.NOT_FOUND).json({ message:"requested path not found"})
-})
-app.listen(PORT,function(){
-    connectdb()
-    console.log(`Server is running at http://localhost:${PORT}`)
-})
+// Start server
+app.listen(PORT, () => {
+  connectdb();
+  console.log(`🚀 Server is running at http://localhost:${PORT}`);
+});
