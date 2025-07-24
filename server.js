@@ -66,12 +66,10 @@ app.use('/api/auth', authRoutes);
 app.use('/api/movies', movieRoutes);
 
 // Catch-all for API routes that don't exist
-app.all('/api/*', (req, res) => {
-  res.status(StatusCodes.NOT_FOUND).json({ message: "API route not found" });
-});
+
 
 // Serve React SPA on all non-API routes
-app.get('*', (req, res) => {
+app.get('/*', (req, res) => {
   res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
 });
 
